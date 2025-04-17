@@ -6,15 +6,17 @@ import express from 'express';
 
 import 'dotenv/config';
 
+import './src/config/envs.config.js';
+
 import { connectDB } from './src/config/db.config.js';
 import { errorHandler, HttpError } from './src/helpers/error-handler.helper.js';
 import { validateObjectId } from './src/middlewares/validate-objectId.middleware.js';
+import { envs } from './src/config/envs.config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -44,6 +46,6 @@ app.use((req, res, next) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(envs.port, () => {
+  console.log(`Server is running on port ${envs.port}`);
 });
