@@ -41,7 +41,7 @@ class UsersController {
     const { id } = req.params;
     const { body } = req;
 
-    if (body.password) {
+    if (body?.password) {
       body.password = await PasswordHelper.hashPassword(body.password);
     }
 

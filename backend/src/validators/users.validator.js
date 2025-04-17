@@ -15,9 +15,7 @@ export const userCreatedCheck = [
 ];
 
 export const userUpdateCheck = [
-  IsString('name', true),
-  IsEmail('email', true),
-  MinLength('password', 8),
-  IsIn('role', ['admin', 'user'], true),
+  IsString('name', false),
+  IsEmail('email', false),
   validate,
 ];

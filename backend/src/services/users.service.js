@@ -32,6 +32,10 @@ class UsersService {
     return user;
   }
 
+  async findOne(query) {
+    return await User.findOne(query);
+  }
+
   async update(id, dataUser) {
     const userUpdate = await User.findByIdAndUpdate(id, dataUser, {
       new: true,

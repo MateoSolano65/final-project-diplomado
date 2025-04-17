@@ -18,7 +18,11 @@ const verifyToken = (authorization) => {
 };
 
 const getUser = async (decoded) => {
-  return await userService.findById(decoded.id);
+  const user = await userService.findOne({ _id: decoded.id });
+
+  if (!user) throw new HttpError('Not authorized', 401);
+
+  return user;
 };
 
 const checkActiveSession = (user, decoded) => {
