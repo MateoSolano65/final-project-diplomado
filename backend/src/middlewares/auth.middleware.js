@@ -7,7 +7,7 @@ const catchError = (error) => {
     throw new HttpError('Access Token is expired.', 401);
   }
 
-  throw error;
+  throw new HttpError('Not authorized', 401);
 };
 
 const verifyToken = (authorization) => {
