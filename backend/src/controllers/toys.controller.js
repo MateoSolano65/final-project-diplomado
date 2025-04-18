@@ -4,6 +4,7 @@ import { toyService } from '../services/toys.service.js';
 class ToysController {
   async create(req = request, res = response) {
     const { body } = req;
+    body.createdBy = req.user._id;
 
     const toy = await toyService.create(body);
 
@@ -37,12 +38,47 @@ class ToysController {
     return res.status(200).json(toyUpdate);
   }
 
+  async updateCover(req = request, res = response) {
+    const { id } = req.params;
+    const { cover } = req.body;
+
+    const toyUpdate = await toyService.updateCover(id, cover);
+
+    return res.status(200).json(toyUpdate);
+  }
+
   async delete(req = request, res = response) {
     const { id } = req.params;
 
     await toyService.delete(id);
 
     return res.status(204).send();
+  }
+
+  async addImages(req = request, res = response) {
+    const { id } = req.params;
+    const { images } = req.body;
+
+    const toyUpdate = await toyService.addImages(id, images);
+
+    return res.status(200).json(toyUpdate);
+  }
+
+  async replaceImage(req = request, res = response) {
+    const { id, imageId } = req.params;
+    const { image } = req.body;
+
+    const toyUpdate = await toyService.replaceImage(id, imageId, image);
+
+    return res.status(200).json(toyUpdate);
+  }
+
+  async deleteImage(req = request, res = response) {
+    const { id, imageId } = req.params;
+
+    const toyUpdate = await toyService.deleteImage(id, imageId);
+
+    return res.status(200).json(toyUpdate);
   }
 }
 
