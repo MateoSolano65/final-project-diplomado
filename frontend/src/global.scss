@@ -1,0 +1,13 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Estilos globales para asegurar visibilidad del header */
+app-header {
+  display: block !important;
+  position: relative;
+  z-index: 1000;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
