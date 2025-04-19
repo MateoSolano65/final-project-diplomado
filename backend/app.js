@@ -2,6 +2,8 @@ import { join, dirname } from 'path';
 import { readdir } from 'fs/promises';
 import { fileURLToPath } from 'url';
 
+import cors from 'cors';
+
 import express from 'express';
 
 import 'dotenv/config';
@@ -18,6 +20,7 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,6 +41,8 @@ async function loadRoutes() {
 await connectDB();
 
 await loadRoutes();
+
+app.use('/images', express.static(join(__dirname, 'uploads/toys')));
 
 app.use((req, res, next) => {
   const error = new HttpError('Not found', 404);

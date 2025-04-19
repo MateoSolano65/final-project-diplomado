@@ -6,32 +6,18 @@ import {
   IsNumber,
 } from '../helpers/validations.helper.js';
 
-const categories = [
-  'Muñecas',
-  'Carros',
-  'Juegos de mesa',
-  'Peluches',
-  'Legos',
-  'Figuras de acción',
-  'Bicicletas',
-  'Juguetes educativos',
-];
+import { toyCategories } from '../constants/toy.constants.js';
 
 export const toyCreatedCheck = [
   IsString('title', true),
-  IsIn('category', categories, true),
+  IsIn('category', toyCategories, true),
   IsString('description', true),
-  IsString('review', true),
-  IsNumber('rating', true, { min: 1, max: 5 }),
   validate,
 ];
 
 export const toyUpdateCheck = [
   IsString('title', false),
-  IsIn('category', categories, false),
+  IsIn('category', toyCategories, false),
   IsString('description', false),
-  IsString('review', false),
-  IsNumber('rating', false),
-  IsString('imageUrl', false),
   validate,
 ];
