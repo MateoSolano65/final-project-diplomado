@@ -21,16 +21,6 @@ const toySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    review: {
-      type: String, // Here you can include a toy review
-      required: true,
-    },
-    rating: {
-      type: Number,
-      min: 1,
-      max: 5,
-      required: true,
-    },
     cover: {
       type: String, // URL of a toy image (optional)
       required: false,
@@ -50,11 +40,30 @@ const toySchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true, versionKey: false },
+  {
+    timestamps: true,
+    versionKey: false,
+    toJSON: { virtuals: true, id: false },
+    toObject: { virtuals: true, id: false },
+    id: false,
+  },
 );
 
 toySchema.post('save', validateMongo);
 toySchema.post('findOneAndUpdate', validateMongo);
+
+// Configuración del virtual para comentarios
+toySchema.virtual('comments', {
+  ref: 'ToyComment',
+  localField: '_id',
+  foreignField: 'toy',
+  options: {
+    populate: {
+      path: 'user',
+      select: 'name -_id',
+    },
+  },
+});
 
 // Create the toy model
 const Toy = model('Toy', toySchema);

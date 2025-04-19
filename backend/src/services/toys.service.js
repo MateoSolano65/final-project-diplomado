@@ -23,7 +23,12 @@ class ToysService {
   }
 
   async findById(id) {
-    const toy = await Toy.findById(id);
+    const toy = await Toy.findById(id).populate({
+      path: 'comments',
+      options: {
+        sort: { createdAt: -1 },
+      },
+    });
 
     if (!toy) throw new HttpError(TOY_NOT_FOUND, 404);
 
