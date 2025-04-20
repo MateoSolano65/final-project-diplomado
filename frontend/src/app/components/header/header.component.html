@@ -40,8 +40,7 @@
         </ng-container>
 
         <ng-container *ngIf="isLoggedIn">
-          <button mat-button>
-            <!--(click)="logout()">-->
+          <button mat-button (click)="logout()">
             <mat-icon>logout</mat-icon> Cerrar Sesión
           </button>
         </ng-container>

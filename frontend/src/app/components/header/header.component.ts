@@ -16,9 +16,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router, private authService: AuthService) {}
 
-  async ngOnInit(): Promise<void> {
-    // Verificamos el estado de autenticación al iniciar
-    await this.checkAuthStatus();
+  ngOnInit(): void {
+    // Subscribe to authentication status changes
+    this.authSubscription = this.authService.authStatus$.subscribe(
+      (isAuthenticated) => {
+        this.isLoggedIn = isAuthenticated;
+        // Here you could also check if the user is admin
+        // based on the stored user data
+        this.checkAdminStatus();
+      }
+    );
   }
 
   ngOnDestroy(): void {
@@ -27,16 +34,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async checkAuthStatus(): Promise<void> {
-    this.isLoggedIn = await this.authService.isLoggedIn();
-    // Aquí podrías verificar también si el usuario es admin
-    // basado en la info guardada en localStorage
+  private checkAdminStatus(): void {
+    if (this.isLoggedIn) {
+      const userData = this.authService.getUserSession();
+      // Implement your admin check logic based on userData
+      // For example: this.isAdmin = userData?.role === 'admin';
+    } else {
+      this.isAdmin = false;
+    }
   }
 
   async logout(): Promise<void> {
-    await this.authService.logout();
-    this.isLoggedIn = false;
-    this.isAdmin = false;
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 }
