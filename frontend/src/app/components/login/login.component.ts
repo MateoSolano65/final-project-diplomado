@@ -52,7 +52,8 @@ export class LoginComponent implements OnInit {
     this.authService.login(loginData).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/admin']);
+        // this.router.navigate(['/admin']);
+        console.log("✅✅✅ Login exitoso!");
       },
       error: (error) => {
         this.isLoading = false;

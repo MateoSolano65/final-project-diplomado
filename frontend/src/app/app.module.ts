@@ -9,7 +9,6 @@ import { HeaderComponent } from './components/header/header.component';
 import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
 import { LoginComponent } from './components/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
-import { IonicStorageModule }      from '@ionic/storage-angular';
 
 // Material Modules
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -52,8 +51,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatDialogModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
-    IonicStorageModule.forRoot()  
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
