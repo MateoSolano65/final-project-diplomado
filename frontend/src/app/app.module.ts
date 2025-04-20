@@ -6,8 +6,8 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
-import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
-import { LoginComponent } from './components/login/login.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 
@@ -34,7 +34,7 @@ import { MatTableModule } from '@angular/material/table';
     FooterComponent,
     HeaderComponent,
     LoginComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -55,9 +55,9 @@ import { MatTableModule } from '@angular/material/table';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    MatTableModule
+    MatTableModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
