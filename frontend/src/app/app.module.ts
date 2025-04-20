@@ -8,9 +8,10 @@ import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './pages/login/login.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { ToyFormComponent } from './components/toy-form/toy-form.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 // Material Modules
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -63,7 +64,13 @@ import { MatSelectModule } from '@angular/material/select';
     MatSliderModule,
     MatSelectModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

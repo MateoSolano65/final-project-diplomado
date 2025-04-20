@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { ToyService, ToyCreateDto } from '../../services/toy/toy.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-toy-form',
@@ -35,7 +37,8 @@ export class ToyFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
-    private location: Location
+    private location: Location,
+    private toyService: ToyService
   ) {
     this.toyForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -61,7 +64,7 @@ export class ToyFormComponent implements OnInit {
   loadToyData(id: string): void {
     this.isLoading = true;
     
-    // In a real app, you would call your service here to get toy data
+    // Here you would call the toyService to get the toy by ID
     // For now, let's just simulate a delay
     setTimeout(() => {
       // Mock data - in a real app this would come from a service
@@ -84,20 +87,41 @@ export class ToyFormComponent implements OnInit {
     }
     
     this.isLoading = true;
-    const formData = this.toyForm.value;
+    const formData: ToyCreateDto = this.toyForm.value;
     
-    // Here you would call your service to save the toy
-    console.log('Form data to submit:', formData);
-    
-    // Simulate API call
+    if (this.isEditMode && this.toyId) {
+      // Edit mode logic would go here
+      // You would call toyService.updateToy(this.toyId, formData)
+      this.simulateSubmit('¡Juguete actualizado con éxito!');
+    } else {
+      // Create new toy
+      this.toyService.createToy(formData)
+        .pipe(
+          finalize(() => this.isLoading = false)
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('Toy created successfully:', response);
+            this.snackBar.open('¡Juguete creado con éxito!', 'Cerrar', { duration: 3000 });
+            this.router.navigate(['/admin']);
+          },
+          error: (error) => {
+            console.error('Error creating toy:', error);
+            this.snackBar.open(
+              'Error al crear el juguete. Por favor intenta de nuevo.',
+              'Cerrar',
+              { duration: 5000 }
+            );
+          }
+        });
+    }
+  }
+
+  // Helper method for simulating API response in edit mode
+  private simulateSubmit(message: string): void {
     setTimeout(() => {
       this.isLoading = false;
-      this.snackBar.open(
-        this.isEditMode ? '¡Juguete actualizado con éxito!' : '¡Juguete creado con éxito!',
-        'Cerrar',
-        { duration: 3000 }
-      );
-      
+      this.snackBar.open(message, 'Cerrar', { duration: 3000 });
       this.router.navigate(['/admin']);
     }, 1500);
   }
