@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/user/auth.service';
 import { Router } from '@angular/router';
 import { LoginInterface } from '../../types';
@@ -8,7 +8,7 @@ import { LoginInterface } from '../../types';
   selector: 'app-login',
   standalone: false,
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
@@ -50,10 +50,17 @@ export class LoginComponent implements OnInit {
     };
 
     this.authService.login(loginData).subscribe({
-      next: () => {
+      next: (response) => {
         this.isLoading = false;
-        this.router.navigate(['/admin']);
-        console.log("✅✅✅ Login exitoso!");
+
+        // Redirigir según el rol del usuario
+        if (response.user.role === 'admin') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/']); // Usuarios normales van al home
+        }
+
+        console.log('✅✅✅ Login exitoso!');
       },
       error: (error) => {
         this.isLoading = false;
@@ -65,4 +72,3 @@ export class LoginComponent implements OnInit {
     });
   }
 }
-

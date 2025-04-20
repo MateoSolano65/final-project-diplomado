@@ -21,8 +21,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.authSubscription = this.authService.authStatus$.subscribe(
       (isAuthenticated) => {
         this.isLoggedIn = isAuthenticated;
-        // Here you could also check if the user is admin
-        // based on the stored user data
         this.checkAdminStatus();
       }
     );
@@ -37,8 +35,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private checkAdminStatus(): void {
     if (this.isLoggedIn) {
       const userData = this.authService.getUserSession();
-      // Implement your admin check logic based on userData
-      // For example: this.isAdmin = userData?.role === 'admin';
+      this.isAdmin = userData?.user?.role === 'admin';
     } else {
       this.isAdmin = false;
     }

@@ -18,7 +18,8 @@ export class AuthService {
   login(data: LoginInterface) {
     return this.http.post<any>(`${environment.apiUrl}/auth/login`, data).pipe(
       tap((response) => {
-        this.saveUserSession(data);
+        // Guardamos el objeto response completo que contiene user y token
+        this.saveUserSession(response);
         this.authStatusSubject.next(true);
       })
     );
@@ -41,5 +42,17 @@ export class AuthService {
   getUserSession(): any | null {
     const data = localStorage.getItem(environment.localStorage);
     return data ? JSON.parse(data) : null;
+  }
+
+  // Método para verificar si el usuario es admin
+  isAdmin(): boolean {
+    const userData = this.getUserSession();
+    return userData?.user?.role === 'admin';
+  }
+
+  // Método para obtener el rol del usuario
+  getUserRole(): string | null {
+    const userData = this.getUserSession();
+    return userData?.user?.role || null;
   }
 }
