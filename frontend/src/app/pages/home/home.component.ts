@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ToyService, ToyResponse } from '../../services/toy/toy.service';
 import { AuthService } from '../../services/user/auth.service';
+import { ImageService } from '../../services/utils/image.service';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +21,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private toyService: ToyService, 
     private snackBar: MatSnackBar,
-    private authService: AuthService
+    private authService: AuthService,
+    public imageService: ImageService
   ) {}
 
   ngOnInit(): void {

@@ -54,12 +54,15 @@
           <th mat-header-cell *matHeaderCellDef>Imagen</th>
           <td mat-cell *matCellDef="let toy">
             <img 
-              *ngIf="toy.cover" 
-              [src]="toy.cover" 
+              *ngIf="toy.cover || (toy.images && toy.images.length > 0)" 
+              [src]="toy.cover ? imageService.getFullImageUrl(toy.cover) : 
+                    (toy.images && toy.images.length > 0) ? 
+                    imageService.getFullImageUrl(toy.images[0].url) : 
+                    'assets/icon/toy_blog_logo.png'" 
               [alt]="toy.title" 
               class="toy-thumbnail" 
             />
-            <span *ngIf="!toy.cover" class="no-image">
+            <span *ngIf="!toy.cover && (!toy.images || toy.images.length === 0)" class="no-image">
               <mat-icon>image_not_supported</mat-icon>
             </span>
           </td>

@@ -6,6 +6,7 @@ import { Location } from '@angular/common';
 import { ToyService, ToyCreateDto } from '../../services/toy/toy.service';
 import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { EMPTY, of } from 'rxjs';
+import { ImageService } from '../../services/utils/image.service';
 
 @Component({
   selector: 'app-toy-form',
@@ -40,7 +41,8 @@ export class ToyFormComponent implements OnInit {
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
     private location: Location,
-    private toyService: ToyService
+    private toyService: ToyService,
+    public imageService: ImageService
   ) {
     this.toyForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -78,9 +80,13 @@ export class ToyFormComponent implements OnInit {
             rating: toyData.rating || 1
           });
           
-          // Si hay una imagen, establecer la vista previa
+          // Si hay una imagen de portada, establecer la vista previa
           if (toyData.cover) {
-            this.imagePreview = toyData.cover;
+            this.imagePreview = this.imageService.getFullImageUrl(toyData.cover);
+          } 
+          // Si no hay portada pero hay imágenes, usar la primera imagen
+          else if (toyData.images && toyData.images.length > 0) {
+            this.imagePreview = this.imageService.getFullImageUrl(toyData.images[0].url);
           }
         },
         error: (error) => {

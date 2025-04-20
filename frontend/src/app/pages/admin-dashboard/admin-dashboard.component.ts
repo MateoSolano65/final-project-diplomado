@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
 import { ToyService, ToyResponse } from '../../services/toy/toy.service';
 import { finalize } from 'rxjs/operators';
+import { ImageService } from '../../services/utils/image.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -20,7 +20,7 @@ export class AdminDashboardComponent implements OnInit {
   constructor(
     private toyService: ToyService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    public imageService: ImageService
   ) {}
 
   ngOnInit(): void {
@@ -65,7 +65,22 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   onDelete(toy: ToyResponse): void {
-    // Implementation will be added later
-    console.log('Delete toy', toy);
+    if (confirm(`¿Estás seguro de eliminar el juguete "${toy.title}"?`)) {
+      this.toyService.deleteToy(toy._id).subscribe({
+        next: () => {
+          this.toys = this.toys.filter(t => t._id !== toy._id);
+          this.dataSource = this.dataSource.filter(t => t._id !== toy._id);
+          this.snackBar.open('Juguete eliminado con éxito', 'Cerrar', {
+            duration: 3000
+          });
+        },
+        error: (error) => {
+          console.error('Error al eliminar juguete:', error);
+          this.snackBar.open('Error al eliminar el juguete', 'Cerrar', {
+            duration: 3000
+          });
+        }
+      });
+    }
   }
 }
