@@ -10,6 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
+import { ToyFormComponent } from './components/toy-form/toy-form.component';
 
 // Material Modules
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -26,6 +27,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -35,6 +38,7 @@ import { MatTableModule } from '@angular/material/table';
     HeaderComponent,
     LoginComponent,
     AdminDashboardComponent,
+    ToyFormComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,6 +60,8 @@ import { MatTableModule } from '@angular/material/table';
     ReactiveFormsModule,
     HttpClientModule,
     MatTableModule,
+    MatSliderModule,
+    MatSelectModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
