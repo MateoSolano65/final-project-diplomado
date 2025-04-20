@@ -83,4 +83,26 @@ export class ToyService {
     // El interceptor añadirá automáticamente el token de autorización si existe
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  /**
+   * Upload images to a toy
+   * @param toyId The ID of the toy to upload images for
+   * @param images The image file(s) to upload
+   * @returns Observable with the response
+   */
+  uploadToyImages(toyId: string, images: File | File[]): Observable<any> {
+    const formData = new FormData();
+
+    if (Array.isArray(images)) {
+      // If multiple images are provided
+      images.forEach((image) => {
+        formData.append('images', image);
+      });
+    } else {
+      // If a single image is provided
+      formData.append('images', images);
+    }
+
+    return this.http.post(`${this.apiUrl}/${toyId}/images`, formData);
+  }
 }

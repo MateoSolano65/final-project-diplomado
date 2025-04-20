@@ -4,7 +4,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { ToyService, ToyCreateDto } from '../../services/toy/toy.service';
-import { finalize } from 'rxjs';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
+import { EMPTY, of } from 'rxjs';
 
 @Component({
   selector: 'app-toy-form',
@@ -15,6 +16,7 @@ import { finalize } from 'rxjs';
 export class ToyFormComponent implements OnInit {
   toyForm: FormGroup;
   isLoading = false;
+  isUploadingImage = false;
   isEditMode = false;
   toyId: string | null = null;
   imagePreview: string | null = null;
@@ -55,30 +57,42 @@ export class ToyFormComponent implements OnInit {
     
     if (this.toyId) {
       this.isEditMode = true;
-      // In a real app, we would fetch the toy data here
       this.loadToyData(this.toyId);
     }
   }
 
-  // Placeholder for loading toy data in edit mode
   loadToyData(id: string): void {
     this.isLoading = true;
     
-    // Here you would call the toyService to get the toy by ID
-    // For now, let's just simulate a delay
-    setTimeout(() => {
-      // Mock data - in a real app this would come from a service
-      const mockToy = {
-        title: 'Ejemplo de Juguete',
-        category: 'Muñecas',
-        description: 'Esta es una descripción de ejemplo para el juguete',
-        review: 'Reseña de ejemplo para el juguete',
-        rating: 4
-      };
-      
-      this.toyForm.patchValue(mockToy);
-      this.isLoading = false;
-    }, 1000);
+    this.toyService.getToyById(id)
+      .pipe(
+        finalize(() => this.isLoading = false)
+      )
+      .subscribe({
+        next: (toyData) => {
+          this.toyForm.patchValue({
+            title: toyData.title,
+            category: toyData.category,
+            description: toyData.description,
+            review: toyData.review || '',
+            rating: toyData.rating || 1
+          });
+          
+          // Si hay una imagen, establecer la vista previa
+          if (toyData.cover) {
+            this.imagePreview = toyData.cover;
+          }
+        },
+        error: (error) => {
+          console.error('Error al cargar el juguete:', error);
+          this.snackBar.open(
+            'Error al cargar la información del juguete. Por favor, intenta de nuevo.',
+            'Cerrar',
+            { duration: 5000 }
+          );
+          this.router.navigate(['/admin']);
+        }
+      });
   }
 
   onSubmit(): void {
@@ -90,40 +104,96 @@ export class ToyFormComponent implements OnInit {
     const formData: ToyCreateDto = this.toyForm.value;
     
     if (this.isEditMode && this.toyId) {
-      // Edit mode logic would go here
-      // You would call toyService.updateToy(this.toyId, formData)
-      this.simulateSubmit('¡Juguete actualizado con éxito!');
+      this.updateToy(this.toyId, formData);
     } else {
-      // Create new toy
-      this.toyService.createToy(formData)
-        .pipe(
-          finalize(() => this.isLoading = false)
-        )
-        .subscribe({
-          next: (response) => {
-            console.log('Toy created successfully:', response);
-            this.snackBar.open('¡Juguete creado con éxito!', 'Cerrar', { duration: 3000 });
-            this.router.navigate(['/admin']);
-          },
-          error: (error) => {
-            console.error('Error creating toy:', error);
-            this.snackBar.open(
-              'Error al crear el juguete. Por favor intenta de nuevo.',
-              'Cerrar',
-              { duration: 5000 }
-            );
-          }
-        });
+      this.createToy(formData);
     }
   }
-
-  // Helper method for simulating API response in edit mode
-  private simulateSubmit(message: string): void {
-    setTimeout(() => {
-      this.isLoading = false;
-      this.snackBar.open(message, 'Cerrar', { duration: 3000 });
-      this.router.navigate(['/admin']);
-    }, 1500);
+  
+  private createToy(formData: ToyCreateDto): void {
+    this.toyService.createToy(formData)
+      .pipe(
+        switchMap(response => {
+          // Si hay una imagen para cargar después de crear el juguete
+          if (this.imageFile && response._id) {
+            this.isUploadingImage = true;
+            return this.toyService.uploadToyImages(response._id, this.imageFile).pipe(
+              catchError(error => {
+                console.error('Error al cargar la imagen:', error);
+                this.snackBar.open(
+                  'El juguete se creó correctamente, pero hubo un error al cargar la imagen.',
+                  'Cerrar',
+                  { duration: 5000 }
+                );
+                return of(response); // Devolver la respuesta original para continuar el flujo
+              })
+            );
+          }
+          return of(response);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+          this.isUploadingImage = false;
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Toy created successfully:', response);
+          this.snackBar.open('¡Juguete creado con éxito!', 'Cerrar', { duration: 3000 });
+          this.router.navigate(['/admin']);
+        },
+        error: (error) => {
+          console.error('Error creating toy:', error);
+          this.snackBar.open(
+            'Error al crear el juguete. Por favor intenta de nuevo.',
+            'Cerrar',
+            { duration: 5000 }
+          );
+        }
+      });
+  }
+  
+  private updateToy(id: string, formData: Partial<ToyCreateDto>): void {
+    this.toyService.updateToy(id, formData)
+      .pipe(
+        switchMap(response => {
+          // Si hay una nueva imagen para cargar después de actualizar el juguete
+          if (this.imageFile && response._id) {
+            this.isUploadingImage = true;
+            return this.toyService.uploadToyImages(response._id, this.imageFile).pipe(
+              catchError(error => {
+                console.error('Error al cargar la imagen:', error);
+                this.snackBar.open(
+                  'El juguete se actualizó correctamente, pero hubo un error al cargar la imagen.',
+                  'Cerrar',
+                  { duration: 5000 }
+                );
+                return of(response); // Devolver la respuesta original para continuar el flujo
+              })
+            );
+          }
+          return of(response);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+          this.isUploadingImage = false;
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Juguete actualizado con éxito:', response);
+          this.snackBar.open('¡Juguete actualizado con éxito!', 'Cerrar', { duration: 3000 });
+          this.router.navigate(['/admin']);
+        },
+        error: (error) => {
+          console.error('Error al actualizar juguete:', error);
+          this.snackBar.open(
+            'Error al actualizar el juguete. Por favor intenta de nuevo.',
+            'Cerrar',
+            { duration: 5000 }
+          );
+        }
+      });
   }
 
   onCancel(): void {

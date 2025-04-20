@@ -13,6 +13,11 @@
     </p>
   </div>
 
+  <div *ngIf="isUploadingImage" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Subiendo imagen...</p>
+  </div>
+
   <mat-card *ngIf="!isLoading">
     <mat-card-content>
       <form [formGroup]="toyForm" (ngSubmit)="onSubmit()">
@@ -139,7 +144,7 @@
             type="submit"
             mat-raised-button
             color="primary"
-            [disabled]="toyForm.invalid"
+            [disabled]="toyForm.invalid || isLoading || isUploadingImage"
           >
             <mat-icon>{{ isEditMode ? "save" : "add" }}</mat-icon>
             {{ isEditMode ? "Actualizar" : "Crear" }} Juguete
