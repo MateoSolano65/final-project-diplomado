@@ -13,7 +13,17 @@
         <h3>Enlaces</h3>
         <ul class="footer-links">
           <li><a routerLink="/">Inicio</a></li>
-          <li><a routerLink="/auth/login">Iniciar Sesión</a></li>
+
+          <ng-container *ngIf="!isLoggedIn">
+            <li><a routerLink="/login">Iniciar Sesión</a></li>
+          </ng-container>
+
+          <ng-container *ngIf="isLoggedIn">
+            <li *ngIf="isAdmin"><a routerLink="/admin">Panel Admin</a></li>
+            <li *ngIf="isAdmin">
+              <a routerLink="/admin/create">Nuevo Juguete</a>
+            </li>
+          </ng-container>
         </ul>
       </div>
 
