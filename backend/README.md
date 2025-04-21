@@ -218,6 +218,8 @@ Las imágenes subidas se pueden acceder directamente a través de la URL:
 
 - `http://localhost:<PORT>/images/:url` donde <PORT> es el puerto configurado en el archivo `.env`. y `url` es el valor de la propiedad `url` de cada imagen.
 
+
+## Usuario administrador
 Para interactuar como un administrador debes ingresar con las credenciales especificadas en el archivo `.env`.
 
 ## Contribución
