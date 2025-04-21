@@ -14,6 +14,7 @@ import { connectDB } from './src/config/db.config.js';
 import { errorHandler, HttpError } from './src/helpers/error-handler.helper.js';
 import { validateObjectId } from './src/middlewares/validate-objectId.middleware.js';
 import { envs } from './src/config/envs.config.js';
+import { createAdminUser } from './src/helpers/admin.helper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -39,6 +40,8 @@ async function loadRoutes() {
 }
 
 await connectDB();
+
+await createAdminUser()
 
 await loadRoutes();
 
