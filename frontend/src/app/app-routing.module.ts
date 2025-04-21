@@ -4,6 +4,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { ToyFormComponent } from './components/toy-form/toy-form.component';
+import { ToyDetailsComponent } from './components/toy-details/toy-details.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -12,6 +13,7 @@ const routes: Routes = [
   { path: 'admin', component: AdminDashboardComponent },
   { path: 'admin/create', component: ToyFormComponent },
   { path: 'admin/edit/:id', component: ToyFormComponent },
+  { path: 'toys/:id', component: ToyDetailsComponent },
 ];
 
 @NgModule({

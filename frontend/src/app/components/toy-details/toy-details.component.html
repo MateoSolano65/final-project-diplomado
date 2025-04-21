@@ -1,0 +1,282 @@
+<div class="toy-details-container">
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando detalles del juguete...</p>
+  </div>
+
+  <div *ngIf="!isLoading && !toy" class="not-found">
+    <mat-icon>sentiment_dissatisfied</mat-icon>
+    <h2>Juguete no encontrado</h2>
+    <p>El juguete que estás buscando no existe o ha sido eliminado.</p>
+    <button mat-raised-button color="primary" (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon> Volver
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && toy" class="toy-content">
+    <!-- Botón volver -->
+    <div class="back-button">
+      <button mat-icon-button (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+
+    <!-- Header con título y acciones -->
+    <div class="toy-header">
+      <div class="title-section">
+        <h1 class="toy-title">{{ toy.title }}</h1>
+        <span class="toy-category">{{ toy.category }}</span>
+      </div>
+
+      <div class="actions-section" *ngIf="isAdmin">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="onEdit()"
+          matTooltip="Editar juguete"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="onDelete()"
+          matTooltip="Eliminar juguete"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sección de imágenes con carrusel -->
+    <div class="image-section" *ngIf="allImages.length > 0">
+      <div class="image-carousel">
+        <button
+          mat-icon-button
+          class="nav-button prev-button"
+          (click)="prevImage()"
+          *ngIf="allImages.length > 1"
+        >
+          <mat-icon>navigate_before</mat-icon>
+        </button>
+
+        <div class="main-image-container">
+          <img
+            [src]="allImages[currentImageIndex]"
+            [alt]="toy.title"
+            class="main-image"
+          />
+        </div>
+
+        <button
+          mat-icon-button
+          class="nav-button next-button"
+          (click)="nextImage()"
+          *ngIf="allImages.length > 1"
+        >
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+      </div>
+
+      <!-- Miniaturas de imágenes -->
+      <div class="image-thumbnails" *ngIf="allImages.length > 1">
+        <div
+          *ngFor="let image of allImages; let i = index"
+          class="thumbnail-container"
+          [class.active]="i === currentImageIndex"
+          (click)="selectImage(i)"
+        >
+          <img
+            [src]="image"
+            [alt]="'Imagen ' + (i + 1)"
+            class="thumbnail-image"
+          />
+        </div>
+      </div>
+
+      <!-- Indicadores de imágenes -->
+      <div class="image-indicators" *ngIf="allImages.length > 1">
+        <span
+          *ngFor="let image of allImages; let i = index"
+          class="indicator"
+          [class.active]="i === currentImageIndex"
+          (click)="selectImage(i)"
+        ></span>
+      </div>
+    </div>
+
+    <!-- Detalles del juguete -->
+    <mat-card class="toy-info-card">
+      <mat-card-content>
+        <div class="toy-meta">
+          <div class="meta-item">
+            <mat-icon>calendar_today</mat-icon>
+            <span>{{ toy.createdAt | date : "dd/MM/yyyy" }}</span>
+          </div>
+
+          <div class="meta-item" *ngIf="toy.rating">
+            <mat-icon>star</mat-icon>
+            <span>{{ toy.rating }}/5</span>
+          </div>
+        </div>
+
+        <div class="toy-description">
+          <h2>Descripción</h2>
+          <p>{{ toy.description }}</p>
+        </div>
+
+        <div class="toy-review" *ngIf="toy.review">
+          <h2>Reseña</h2>
+          <p>{{ toy.review }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Sección de comentarios -->
+    <div #commentsSection id="comments" class="comments-section">
+      <h2>Comentarios</h2>
+
+      <!-- Loading indicator for comments -->
+      <div *ngIf="isLoadingComments" class="loading-comments">
+        <mat-spinner diameter="30"></mat-spinner>
+        <p>Cargando comentarios...</p>
+      </div>
+
+      <!-- Si no hay comentarios -->
+      <div *ngIf="!isLoadingComments && !hasComments" class="no-comments">
+        <mat-icon>forum</mat-icon>
+        <p>No hay comentarios para este juguete.</p>
+        <p>¡Sé el primero en comentar!</p>
+      </div>
+
+      <!-- Formulario de comentarios (visible solo si está autenticado) -->
+      <div class="comment-form-container" *ngIf="isLoggedIn">
+        <mat-card>
+          <mat-card-content>
+            <h3>Deja tu comentario</h3>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Escribe tu comentario</mat-label>
+              <textarea
+                matInput
+                rows="3"
+                placeholder="¿Qué opinas de este juguete?"
+                [formControl]="commentContent"
+              ></textarea>
+              <mat-error *ngIf="commentContent.hasError('required')">
+                El comentario no puede estar vacío
+              </mat-error>
+              <mat-error *ngIf="commentContent.hasError('maxlength')">
+                El comentario no puede exceder los 500 caracteres
+              </mat-error>
+            </mat-form-field>
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="commentContent.invalid || isSubmittingComment"
+              (click)="submitComment()"
+            >
+              <mat-icon>send</mat-icon>
+              <span *ngIf="!isSubmittingComment">Enviar comentario</span>
+              <span *ngIf="isSubmittingComment">Enviando...</span>
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Mensaje para iniciar sesión si no está autenticado -->
+      <div class="login-prompt" *ngIf="!isLoggedIn">
+        <p>
+          Debes <a routerLink="/login">iniciar sesión</a> para dejar un
+          comentario.
+        </p>
+      </div>
+
+      <!-- Lista de comentarios -->
+      <div class="comments-list" *ngIf="!isLoadingComments && hasComments">
+        <mat-card class="comment-card" *ngFor="let comment of comments">
+          <mat-card-header>
+            <div mat-card-avatar class="user-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <mat-card-title>{{ comment.user.name }}</mat-card-title>
+            <mat-card-subtitle>{{
+              comment.createdAt | date : "dd/MM/yyyy HH:mm"
+            }}</mat-card-subtitle>
+
+            <!-- Edit button - only shown to comment owner -->
+            <button
+              mat-icon-button
+              *ngIf="
+                canEditComment(comment) && editingCommentId !== comment._id
+              "
+              color="primary"
+              (click)="startEditComment(comment)"
+              matTooltip="Editar comentario"
+              class="edit-comment-btn"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <!-- Delete button - shown to admin or comment owner -->
+            <button
+              mat-icon-button
+              *ngIf="
+                canDeleteComment(comment) && editingCommentId !== comment._id
+              "
+              color="warn"
+              (click)="deleteComment(comment._id)"
+              matTooltip="Eliminar comentario"
+              class="delete-comment-btn"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-card-header>
+
+          <!-- Regular comment display -->
+          <mat-card-content *ngIf="editingCommentId !== comment._id">
+            <p>{{ comment.content }}</p>
+          </mat-card-content>
+
+          <!-- Edit comment form -->
+          <mat-card-content *ngIf="editingCommentId === comment._id">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Editar comentario</mat-label>
+              <textarea
+                matInput
+                rows="3"
+                [formControl]="editCommentContent"
+              ></textarea>
+              <mat-error *ngIf="editCommentContent.hasError('required')">
+                El comentario no puede estar vacío
+              </mat-error>
+              <mat-error *ngIf="editCommentContent.hasError('maxlength')">
+                El comentario no puede exceder los 500 caracteres
+              </mat-error>
+            </mat-form-field>
+
+            <div class="edit-actions">
+              <button
+                mat-button
+                (click)="cancelEditComment()"
+                [disabled]="isEditingComment"
+              >
+                Cancelar
+              </button>
+
+              <button
+                mat-raised-button
+                color="primary"
+                [disabled]="editCommentContent.invalid || isEditingComment"
+                (click)="updateComment(comment._id)"
+              >
+                <mat-icon>save</mat-icon>
+                <span *ngIf="!isEditingComment">Guardar cambios</span>
+                <span *ngIf="isEditingComment">Guardando...</span>
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

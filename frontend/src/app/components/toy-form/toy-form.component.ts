@@ -20,7 +20,7 @@ export class ToyFormComponent implements OnInit {
   isUploadingImage = false;
   isEditMode = false;
   toyId: string | null = null;
-  imagePreview: string | null = null;
+  imagePreview: string | null | undefined = null;
   imageFile: File | null = null;
   
   // Categories from backend
