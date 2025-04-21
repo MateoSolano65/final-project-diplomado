@@ -137,4 +137,4 @@ dist
 .pnp.*
 
 # images
-# uploads
+uploads
