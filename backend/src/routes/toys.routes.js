@@ -64,7 +64,7 @@ router.delete(
 
 router
   .route(`${prefix}/:toyId/comments`)
-  .get(Auth(), toyCommentController.getAll)
+  .get(toyCommentController.getAll)
   .post(Auth(), toyCommentCreatedCheck, toyCommentController.create);
 
 router
