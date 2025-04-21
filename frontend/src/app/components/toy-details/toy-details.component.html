@@ -136,8 +136,14 @@
     <div #commentsSection id="comments" class="comments-section">
       <h2>Comentarios</h2>
 
+      <!-- Loading indicator for comments -->
+      <div *ngIf="isLoadingComments" class="loading-comments">
+        <mat-spinner diameter="30"></mat-spinner>
+        <p>Cargando comentarios...</p>
+      </div>
+
       <!-- Si no hay comentarios -->
-      <div class="no-comments">
+      <div *ngIf="!isLoadingComments && !hasComments" class="no-comments">
         <mat-icon>forum</mat-icon>
         <p>No hay comentarios para este juguete.</p>
         <p>¡Sé el primero en comentar!</p>
@@ -154,10 +160,24 @@
                 matInput
                 rows="3"
                 placeholder="¿Qué opinas de este juguete?"
+                [formControl]="commentContent"
               ></textarea>
+              <mat-error *ngIf="commentContent.hasError('required')">
+                El comentario no puede estar vacío
+              </mat-error>
+              <mat-error *ngIf="commentContent.hasError('maxlength')">
+                El comentario no puede exceder los 500 caracteres
+              </mat-error>
             </mat-form-field>
-            <button mat-raised-button color="primary">
-              <mat-icon>send</mat-icon> Enviar comentario
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="commentContent.invalid || isSubmittingComment"
+              (click)="submitComment()"
+            >
+              <mat-icon>send</mat-icon>
+              <span *ngIf="!isSubmittingComment">Enviar comentario</span>
+              <span *ngIf="isSubmittingComment">Enviando...</span>
             </button>
           </mat-card-content>
         </mat-card>
@@ -171,22 +191,89 @@
         </p>
       </div>
 
-      <!-- Lista de comentarios (se mostraría cuando haya comentarios) -->
-      <div class="comments-list">
-        <!-- Comentario ejemplo (se reemplazaría con datos reales) -->
-        <mat-card class="comment-card">
+      <!-- Lista de comentarios -->
+      <div class="comments-list" *ngIf="!isLoadingComments && hasComments">
+        <mat-card class="comment-card" *ngFor="let comment of comments">
           <mat-card-header>
             <div mat-card-avatar class="user-avatar">
               <mat-icon>person</mat-icon>
             </div>
-            <mat-card-title>Usuario Ejemplo</mat-card-title>
-            <mat-card-subtitle>12/04/2025</mat-card-subtitle>
+            <mat-card-title>{{ comment.user.name }}</mat-card-title>
+            <mat-card-subtitle>{{
+              comment.createdAt | date : "dd/MM/yyyy HH:mm"
+            }}</mat-card-subtitle>
+
+            <!-- Edit button - only shown to comment owner -->
+            <button
+              mat-icon-button
+              *ngIf="
+                canEditComment(comment) && editingCommentId !== comment._id
+              "
+              color="primary"
+              (click)="startEditComment(comment)"
+              matTooltip="Editar comentario"
+              class="edit-comment-btn"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <!-- Delete button - shown to admin or comment owner -->
+            <button
+              mat-icon-button
+              *ngIf="
+                canDeleteComment(comment) && editingCommentId !== comment._id
+              "
+              color="warn"
+              (click)="deleteComment(comment._id)"
+              matTooltip="Eliminar comentario"
+              class="delete-comment-btn"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
           </mat-card-header>
-          <mat-card-content>
-            <p>
-              Este es un comentario de ejemplo. En el futuro, aquí se mostrarán
-              los comentarios reales de los usuarios.
-            </p>
+
+          <!-- Regular comment display -->
+          <mat-card-content *ngIf="editingCommentId !== comment._id">
+            <p>{{ comment.content }}</p>
+          </mat-card-content>
+
+          <!-- Edit comment form -->
+          <mat-card-content *ngIf="editingCommentId === comment._id">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Editar comentario</mat-label>
+              <textarea
+                matInput
+                rows="3"
+                [formControl]="editCommentContent"
+              ></textarea>
+              <mat-error *ngIf="editCommentContent.hasError('required')">
+                El comentario no puede estar vacío
+              </mat-error>
+              <mat-error *ngIf="editCommentContent.hasError('maxlength')">
+                El comentario no puede exceder los 500 caracteres
+              </mat-error>
+            </mat-form-field>
+
+            <div class="edit-actions">
+              <button
+                mat-button
+                (click)="cancelEditComment()"
+                [disabled]="isEditingComment"
+              >
+                Cancelar
+              </button>
+
+              <button
+                mat-raised-button
+                color="primary"
+                [disabled]="editCommentContent.invalid || isEditingComment"
+                (click)="updateComment(comment._id)"
+              >
+                <mat-icon>save</mat-icon>
+                <span *ngIf="!isEditingComment">Guardar cambios</span>
+                <span *ngIf="isEditingComment">Guardando...</span>
+              </button>
+            </div>
           </mat-card-content>
         </mat-card>
       </div>

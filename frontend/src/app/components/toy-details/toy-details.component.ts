@@ -11,6 +11,13 @@ import { ToyService, ToyResponse } from '../../services/toy/toy.service';
 import { ImageService } from '../../services/utils/image.service';
 import { AuthService } from '../../services/user/auth.service';
 import { Location } from '@angular/common';
+import {
+  CommentService,
+  ToyComment,
+  ToyCommentCreateDto,
+} from '../../services/toy/comment.service';
+import { FormControl, Validators } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-toy-details',
@@ -26,6 +33,24 @@ export class ToyDetailsComponent implements OnInit, AfterViewInit {
   currentImageIndex = 0;
   allImages: string[] = [];
 
+  // Comment related properties
+  comments: ToyComment[] = [];
+  commentContent = new FormControl('', [
+    Validators.required,
+    Validators.maxLength(500),
+  ]);
+  isLoadingComments = false;
+  isSubmittingComment = false;
+  hasComments = false;
+
+  // Edit comment properties
+  editingCommentId: string | null = null;
+  editCommentContent = new FormControl('', [
+    Validators.required,
+    Validators.maxLength(500),
+  ]);
+  isEditingComment = false;
+
   @ViewChild('commentsSection') commentsSection: ElementRef | undefined;
 
   constructor(
@@ -35,7 +60,8 @@ export class ToyDetailsComponent implements OnInit, AfterViewInit {
     private snackBar: MatSnackBar,
     public imageService: ImageService,
     private authService: AuthService,
-    private location: Location
+    private location: Location,
+    private commentService: CommentService
   ) {}
 
   ngOnInit(): void {
@@ -44,6 +70,7 @@ export class ToyDetailsComponent implements OnInit, AfterViewInit {
     const toyId = this.route.snapshot.paramMap.get('id');
     if (toyId) {
       this.loadToyDetails(toyId);
+      this.loadComments(toyId);
     } else {
       this.snackBar.open('ID de juguete no encontrado', 'Cerrar', {
         duration: 3000,
@@ -129,6 +156,159 @@ export class ToyDetailsComponent implements OnInit, AfterViewInit {
         this.router.navigate(['/']);
       },
     });
+  }
+
+  loadComments(toyId: string): void {
+    this.isLoadingComments = true;
+    this.commentService
+      .getComments(toyId)
+      .pipe(finalize(() => (this.isLoadingComments = false)))
+      .subscribe({
+        next: (comments) => {
+          this.comments = comments;
+          this.hasComments = comments.length > 0;
+        },
+        error: (error) => {
+          console.error('Error al cargar los comentarios:', error);
+          this.snackBar.open(
+            'Error al cargar los comentarios. Por favor, intenta de nuevo.',
+            'Cerrar',
+            { duration: 3000 }
+          );
+        },
+      });
+  }
+
+  submitComment(): void {
+    if (!this.isLoggedIn || !this.toy || this.commentContent.invalid) {
+      return;
+    }
+
+    const content = this.commentContent.value?.trim();
+    if (!content) {
+      return;
+    }
+
+    this.isSubmittingComment = true;
+    this.commentService
+      .createComment(this.toy._id, { content })
+      .pipe(finalize(() => (this.isSubmittingComment = false)))
+      .subscribe({
+        next: (newComment) => {
+          // Add new comment to the beginning of the list (newest first)
+          this.comments.unshift(newComment);
+          this.hasComments = true;
+          this.commentContent.reset();
+          this.snackBar.open('Comentario publicado con éxito', 'Cerrar', {
+            duration: 3000,
+          });
+        },
+        error: (error) => {
+          console.error('Error al publicar el comentario:', error);
+          this.snackBar.open(
+            'Error al publicar el comentario. Por favor, intenta de nuevo.',
+            'Cerrar',
+            { duration: 3000 }
+          );
+        },
+      });
+  }
+
+  deleteComment(commentId: string): void {
+    if (!this.isLoggedIn || !this.toy) {
+      return;
+    }
+
+    if (confirm('¿Estás seguro de eliminar este comentario?')) {
+      this.commentService.deleteComment(this.toy._id, commentId).subscribe({
+        next: () => {
+          this.comments = this.comments.filter(
+            (comment) => comment._id !== commentId
+          );
+          this.hasComments = this.comments.length > 0;
+          this.snackBar.open('Comentario eliminado con éxito', 'Cerrar', {
+            duration: 3000,
+          });
+        },
+        error: (error) => {
+          console.error('Error al eliminar el comentario:', error);
+          this.snackBar.open(
+            'Error al eliminar el comentario. Por favor, intenta de nuevo.',
+            'Cerrar',
+            { duration: 3000 }
+          );
+        },
+      });
+    }
+  }
+
+  canDeleteComment(comment: ToyComment): boolean {
+    if (!this.isLoggedIn) return false;
+
+    const userData = this.authService.getUserSession();
+
+    // Allow admin or comment owner to delete
+    return this.isAdmin || userData?.user?._id === comment.user._id;
+  }
+
+  canEditComment(comment: ToyComment): boolean {
+    if (!this.isLoggedIn) return false;
+
+    const userData = this.authService.getUserSession();
+
+    // Only the comment owner can edit their comment
+    return userData?.user?._id === comment.user._id;
+  }
+
+  startEditComment(comment: ToyComment): void {
+    this.editingCommentId = comment._id;
+    this.editCommentContent.setValue(comment.content);
+  }
+
+  cancelEditComment(): void {
+    this.editingCommentId = null;
+    this.editCommentContent.reset();
+  }
+
+  updateComment(commentId: string): void {
+    if (!this.isLoggedIn || !this.toy || this.editCommentContent.invalid) {
+      return;
+    }
+
+    const content = this.editCommentContent.value?.trim();
+    if (!content) {
+      return;
+    }
+
+    this.isEditingComment = true;
+    this.commentService
+      .updateComment(this.toy._id, commentId, { content })
+      .pipe(finalize(() => (this.isEditingComment = false)))
+      .subscribe({
+        next: (updatedComment) => {
+          // Update the comment in the array
+          const index = this.comments.findIndex((c) => c._id === commentId);
+          if (index !== -1) {
+            this.comments[index] = updatedComment;
+          }
+
+          // Reset edit state
+          this.editingCommentId = null;
+          this.editCommentContent.reset();
+
+          this.snackBar.open('Comentario actualizado con éxito', 'Cerrar', {
+            duration: 3000,
+          });
+        },
+        error: (error) => {
+          console.error('Error al actualizar el comentario:', error);
+          this.snackBar.open(
+            'Error al actualizar el comentario. Por favor, intenta de nuevo.',
+            'Cerrar',
+            { duration: 3000 }
+          );
+        },
+      });
   }
 
   prevImage(): void {
