@@ -6,6 +6,10 @@ const envSchema = joi
     DB_URI: joi.string().required(),
     JWT_SECRET: joi.string().required(),
     JWT_EXPIRES_IN: joi.string().required(),
+
+    ADMIN_NAME: joi.string().required(),
+    ADMIN_EMAIL: joi.string().email().required(),
+    ADMIN_PASSWORD: joi.string().min(8).required(),
   })
   .unknown(true);
 
@@ -24,4 +28,7 @@ export const envs = {
   dbUri: value.DB_URI,
   jwtSecret: value.JWT_SECRET,
   jwtExpiresIn: value.JWT_EXPIRES_IN,
+  adminName: value.ADMIN_NAME,
+  adminEmail: value.ADMIN_EMAIL,
+  adminPassword: value.ADMIN_PASSWORD,
 };
