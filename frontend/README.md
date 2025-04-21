@@ -1,59 +1,90 @@
-# Frontend
+# Blog de Juguetes - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.8.
+Este proyecto está desarrollado con Angular (versión 19.2) y proporciona la interfaz de usuario para la aplicación Blog de Juguetes.
 
-## Development server
+## Características
 
-To start a local development server, run:
+- Visualización de juguetes con imágenes y descripción
+- Panel de administración para usuarios con rol admin
+- Sistema de autenticación
+- Comentarios en juguetes
+- Interfaz de usuario moderna con Angular Material
+
+## Requisitos previos
+
+- Node.js (versión 16 o superior)
+- npm (normalmente viene con Node.js)
+- Angular CLI (`npm install -g @angular/cli`)
+
+## Instalación
+
+1. Clona el repositorio completo o solo esta carpeta
+
+```bash
+git clone <url-del-repositorio>
+cd final-project-diplomado/frontend
+```
+
+2. Instala las dependencias
+
+```bash
+npm install
+```
+
+3. Configuración de entornos
+
+El proyecto incluye plantillas de archivos de entorno en la carpeta `src/environments/`. **Es necesario crear el archivo de entorno principal** basado en la plantilla proporcionada:
+
+```bash
+# Copia la plantilla de entorno de desarrollo
+cp src/environments/environment.dev.ts src/environments/environment.ts
+```
+
+También puedes modificar estos archivos según tus necesidades específicas, como cambiar la URL de la API o el nombre del almacenamiento local.
+
+## Desarrollo
+
+Para iniciar el servidor de desarrollo:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+El servidor estará disponible en `http://localhost:4200/`. La aplicación se recargará automáticamente si cambias alguno de los archivos de origen.
 
-## Code scaffolding
+## Conexión con el Backend
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+El frontend está configurado para comunicarse con el backend en `http://localhost:3000`. Asegúrate de que el servidor backend esté en funcionamiento antes de utilizar funcionalidades que requieran autenticación o datos del servidor.
 
-```bash
-ng generate component component-name
+Puedes encontrar la configuración de la URL del backend en:
+```
+src/environments/environment.ts
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Construcción
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+Para construir el proyecto para producción:
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Los archivos de la build se almacenarán en el directorio `dist/`. Usa la bandera `--configuration=production` para una compilación de producción.
 
-## Running unit tests
+## Estructura del proyecto
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- `src/app/components`: Componentes reutilizables (header, footer, etc.)
+- `src/app/pages`: Páginas principales (home, login, admin-dashboard)
+- `src/app/services`: Servicios para comunicación con la API REST
+- `src/app/guards`: Guards para proteger rutas autenticadas
+- `src/app/interceptors`: Interceptores HTTP para manejar tokens de autenticación
+- `src/app/shared`: Módulos compartidos (Material UI)
+- `src/environments`: Configuración de entornos (dev, prod)
+
+## Tests
+
+Para ejecutar los tests unitarios:
 
 ```bash
 ng test
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
