@@ -28,7 +28,7 @@ Este proyecto proporciona una API RESTful para gestionar un blog de juguetes, in
 
 ```bash
 git clone <url-del-repositorio>
-cd blog-de-juguetes-diplomado-back
+cd <nombre-del-repositorio>
 ```
 
 2. Instala las dependencias:
@@ -39,13 +39,12 @@ npm install
 
 ## Configuración
 
-1. Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+1. Crea un archivo `.env` en la raíz del proyecto y configura las variables de entorno necesarias. Puedes usar el archivo `.env.example` como referencia:
 
-```
-PORT=3000
-DB_URI=mongodb://localhost:27017/blog-juguetes
-# Añade cualquier otra variable de entorno necesaria, como claves secretas para JWT
-```
+  ```bash
+  cp .env.example .env
+  ```
+
 
 ## Ejecución
 
@@ -88,34 +87,35 @@ uploads/
 
 La API utiliza la base `/api/v1.0` para todas las rutas.
 
-### Rutas principales:
+### Rutas:
 
-- `GET /api/v1.0/` - Mensaje de bienvenida
+## Autenticación y autorización:
+
+- `POST /auth/register` - Registrar un nuevo usuario
+- `POST /auth/login` - Iniciar sesión
 
 ### Usuarios:
 
-- `GET /api/v1.0/users` - Obtener todos los usuarios
-- `GET /api/v1.0/users/:id` - Obtener un usuario específico
-- `POST /api/v1.0/users` - Crear un nuevo usuario
-- `PUT /api/v1.0/users/:id` - Actualizar un usuario
-- `DELETE /api/v1.0/users/:id` - Eliminar un usuario
-- `PATCH /api/v1.0/users/:id/role` - Actualizar el rol de un usuario
+- `GET /users` - Obtener todos los usuarios
+- `GET /users/:id` - Obtener un usuario específico
+- `POST /users` - Crear un nuevo usuario
+- `PUT /users/:id` - Actualizar un usuario
+- `DELETE /users/:id` - Eliminar un usuario
 
 ### Juguetes:
 
-- `GET /api/v1.0/toys` - Obtener todos los juguetes
-- `GET /api/v1.0/toys/:id` - Obtener un juguete específico
-- `POST /api/v1.0/toys` - Crear un nuevo juguete
-- `PUT /api/v1.0/toys/:id` - Actualizar un juguete
-- `DELETE /api/v1.0/toys/:id` - Eliminar un juguete
+- `GET /toys` - Obtener todos los juguetes
+- `GET /toys/:id` - Obtener un juguete específico
+- `POST /toys` - Crear un nuevo juguete
+- `PUT /toys/:id` - Actualizar un juguete
+- `DELETE /toys/:id` - Eliminar un juguete
 
 ### Gestión de imágenes de juguetes:
 
-- `POST /api/v1.0/toys/:id/images` - Añadir una imagen a un juguete
-- `POST /api/v1.0/toys/:id/images/multiple` - Añadir múltiples imágenes a un juguete
-- `GET /api/v1.0/toys/:id/images` - Obtener todas las imágenes de un juguete
-- `DELETE /api/v1.0/toys/:id/images/:filename` - Eliminar una imagen de un juguete
-- `PUT /api/v1.0/toys/:id/images/:filename/main` - Establecer una imagen como principal
+- `PUT /toys/:id/cover` - Añadir una imagen de portada a un juguete
+- `POST /toys/:id/images` - Subir imágenes para un juguete
+- `PUT /toys/:id/images/:imageId` - Actualizar una imagen de un juguete
+- `DELETE /toys/:id/images/:imageId` - Eliminar una imagen de un juguete
 
 ## Modelo de datos
 
@@ -126,7 +126,7 @@ La API utiliza la base `/api/v1.0` para todas las rutas.
   "_id": "ObjectId",
   "name": "String",
   "email": "String",
-  "password": "String (hashed)",
+  "password": "String (hashed)",  // NO se devuelve la contraseña en las respuestas al cliente
   "role": "String (user/admin)",
   "createdAt": "Date",
   "updatedAt": "Date"
@@ -141,16 +141,16 @@ La API utiliza la base `/api/v1.0` para todas las rutas.
   "title": "String",
   "category": "String",
   "description": "String",
-  "review": "String",
-  "rating": "Number (1-5)",
-  "imageUrl": "String",
+  "cover": "String",
   "images": [
     {
-      "filename": "String",
-      "isMain": "Boolean"
+      "_id": "ObjectId",
+      "url": "String",
     }
   ],
   "tags": ["String"],
+  "createdBy": "ObjectId (User)",
+  "lastLogin": "Date",
   "createdAt": "Date",
   "updatedAt": "Date"
 }
@@ -160,7 +160,10 @@ La API utiliza la base `/api/v1.0` para todas las rutas.
 
 Las imágenes subidas se pueden acceder directamente a través de la URL:
 
-- `http://localhost:3000/toys-images/:filename` - Donde `:filename` es el nombre del archivo de imagen
+- `http://localhost:<PORT>/images/:url` donde <PORT> es el puerto configurado en el archivo `.env`. y `url` es el valor de la propiedad `url` de cada imagen.
+
+
+Para interactuar como un administrador debes ingresar con las credenciales especificadas en el archivo `.env`.
 
 ## Contribución
 
