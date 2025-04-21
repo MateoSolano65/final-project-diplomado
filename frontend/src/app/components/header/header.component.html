@@ -34,14 +34,13 @@
 
       <div class="auth-buttons">
         <ng-container *ngIf="!isLoggedIn">
-          <a mat-button routerLink="/auth/login">
+          <a mat-button routerLink="/login">
             <mat-icon>login</mat-icon> Iniciar Sesión
           </a>
         </ng-container>
 
         <ng-container *ngIf="isLoggedIn">
-          <button mat-button>
-            <!--(click)="logout()">-->
+          <button mat-button (click)="logout()">
             <mat-icon>logout</mat-icon> Cerrar Sesión
           </button>
         </ng-container>

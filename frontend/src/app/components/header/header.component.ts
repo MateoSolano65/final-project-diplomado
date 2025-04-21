@@ -1,24 +1,29 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/user/auth.service';
 
 @Component({
   selector: 'app-header',
   standalone: false,
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   isAdmin = false;
   private authSubscription: Subscription | null = null;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
-    // Aquí deberás implementar la lógica para verificar si el usuario está logueado
-    // Ejemplo: this.authService.currentUser$.subscribe(user => {...})
-    console.log('Header component initialized');
+    // Subscribe to authentication status changes
+    this.authSubscription = this.authService.authStatus$.subscribe(
+      (isAuthenticated) => {
+        this.isLoggedIn = isAuthenticated;
+        this.checkAdminStatus();
+      }
+    );
   }
 
   ngOnDestroy(): void {
@@ -27,10 +32,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  logout(): void {
-    // Aquí implementarás la lógica de logout cuando crees el AuthService
-    console.log('Logout clicked');
-    // this.authService.logout();
-    // this.router.navigate(['/']);
+  private checkAdminStatus(): void {
+    if (this.isLoggedIn) {
+      const userData = this.authService.getUserSession();
+      this.isAdmin = userData?.user?.role === 'admin';
+    } else {
+      this.isAdmin = false;
+    }
+  }
+
+  async logout(): Promise<void> {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }
