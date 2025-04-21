@@ -11,6 +11,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { ToyFormComponent } from './components/toy-form/toy-form.component';
+import { ToyDetailsComponent } from './components/toy-details/toy-details.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { MaterialModule } from './shared/material.module'; // Importa el módulo de Material aquí
 
@@ -23,6 +24,7 @@ import { MaterialModule } from './shared/material.module'; // Importa el módulo
     LoginComponent,
     AdminDashboardComponent,
     ToyFormComponent,
+    ToyDetailsComponent,
   ],
   imports: [
     BrowserModule,

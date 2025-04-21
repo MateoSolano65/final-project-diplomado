@@ -85,8 +85,12 @@
         <button mat-button color="primary" [routerLink]="['/toys', toy._id]">
           <mat-icon>visibility</mat-icon> Ver detalle
         </button>
-        <button mat-button (click)="onVote(toy._id)">
-          <mat-icon>chat</mat-icon> Me gusta
+        <button
+          mat-button
+          [routerLink]="['/toys', toy._id]"
+          fragment="comments"
+        >
+          <mat-icon>chat</mat-icon> Ver comentarios
         </button>
         <button
           *ngIf="isAdmin"
