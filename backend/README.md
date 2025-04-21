@@ -117,6 +117,49 @@ La API utiliza la base `/api/v1.0` para todas las rutas.
 - `PUT /toys/:id/images/:imageId` - Actualizar una imagen de un juguete
 - `DELETE /toys/:id/images/:imageId` - Eliminar una imagen de un juguete
 
+### Comentarios a los juguetes:
+
+- `POST /toys/:id/comments` - Crear un nuevo comentario para un juguete
+- `PUT /toys/:id/comments/:commentId` - Actualizar un comentario de un juguete
+- `DELETE /toys/:id/comments/:commentId` - Eliminar un comentario de un juguete
+
+## Seguridad y autorización
+
+### Endpoints protegidos
+
+Algunos endpoints requieren autenticación y/o permisos de administrador para ser accedidos. A continuación, se detalla el nivel de acceso necesario:
+
+#### Requieren autenticación (cualquier usuario autenticado):
+- **Comentarios a los juguetes:**
+  - `POST /toys/:id/comments` - Crear un nuevo comentario para un juguete.
+  - `PUT /toys/:id/comments/:commentId` - Actualizar un comentario de un juguete.
+  - `DELETE /toys/:id/comments/:commentId` - Eliminar un comentario de un juguete.
+
+#### Requieren permisos de administrador:
+- **Gestión de usuarios:**
+  - `GET /users` - Obtener todos los usuarios.
+  - `GET /users/:id` - Obtener un usuario específico.
+  - `POST /users` - Crear un nuevo usuario.
+  - `PUT /users/:id` - Actualizar un usuario.
+  - `DELETE /users/:id` - Eliminar un usuario.
+
+- **Gestión de juguetes:**
+  - `POST /toys` - Crear un nuevo juguete.
+  - `PUT /toys/:id` - Actualizar un juguete.
+  - `DELETE /toys/:id` - Eliminar un juguete.
+
+### Uso del header `Authorization`
+
+Para acceder a los endpoints protegidos, es necesario incluir un header `Authorization` con un token JWT válido. El formato del header es el siguiente:
+
+```http
+Authorization: Bearer <token>
+```
+
+Donde `<token>` es el token JWT generado al iniciar sesión. Este token debe ser enviado en cada solicitud a los endpoints protegidos.
+
+Si el token es inválido, ha expirado o no se incluye, el servidor responderá con un error de autorización.
+
 ## Modelo de datos
 
 ### Usuario
@@ -156,12 +199,24 @@ La API utiliza la base `/api/v1.0` para todas las rutas.
 }
 ```
 
+### Comentario
+
+```json
+{
+  "_id": "ObjectId",
+  "content": "String",
+  "toy": "ObjectId (Toy)",
+  "user": "ObjectId (User)",
+  "createdAt": "Date",
+  "updatedAt": "Date"
+}
+```
+
 ## Acceso a las imágenes
 
 Las imágenes subidas se pueden acceder directamente a través de la URL:
 
 - `http://localhost:<PORT>/images/:url` donde <PORT> es el puerto configurado en el archivo `.env`. y `url` es el valor de la propiedad `url` de cada imagen.
-
 
 Para interactuar como un administrador debes ingresar con las credenciales especificadas en el archivo `.env`.
 
