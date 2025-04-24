@@ -11,9 +11,18 @@ class AuthService {
 
     const user = await userService.create(dataUser);
 
+    // Generate JWT token as in login method
+    const token = JwtService.generateToken({ id: user._id });
+
+    // Set user's lastLogin timestamp
+    const issuedAt = Math.floor(new Date().getTime() / 1000.0);
+    const lastLogin = new Date(issuedAt * 1000);
+    await userService.update(user._id, { lastLogin });
+
     user.password = undefined;
 
-    return user;
+    // Return both user and token, same format as login
+    return { user, token };
   }
 
   async login(email, password) {
