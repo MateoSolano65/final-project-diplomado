@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { LoginInterface } from '../../types';
+import { LoginInterface, RegisterInterface } from '../../types';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -23,6 +23,18 @@ export class AuthService {
         this.authStatusSubject.next(true);
       })
     );
+  }
+
+  register(data: RegisterInterface) {
+    return this.http
+      .post<any>(`${environment.apiUrl}/auth/register`, data)
+      .pipe(
+        tap((response) => {
+          // After registration, we automatically log in the user
+          this.saveUserSession(response);
+          this.authStatusSubject.next(true);
+        })
+      );
   }
 
   logout(): void {

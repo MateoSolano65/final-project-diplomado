@@ -34,7 +34,10 @@
 
       <div class="auth-buttons">
         <ng-container *ngIf="!isLoggedIn">
-          <a mat-button routerLink="/login">
+          <a mat-button routerLink="/register" routerLinkActive="active-link">
+            <mat-icon>person_add</mat-icon> Registrarse
+          </a>
+          <a mat-button routerLink="/login" routerLinkActive="active-link">
             <mat-icon>login</mat-icon> Iniciar Sesión
           </a>
         </ng-container>

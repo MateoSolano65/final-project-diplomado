@@ -13,7 +13,8 @@ import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard
 import { ToyFormComponent } from './components/toy-form/toy-form.component';
 import { ToyDetailsComponent } from './components/toy-details/toy-details.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
-import { MaterialModule } from './shared/material.module'; // Importa el módulo de Material aquí
+import { MaterialModule } from './shared/material.module';
+import { RegisterComponent } from './pages/register/register.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { MaterialModule } from './shared/material.module'; // Importa el módulo
     AdminDashboardComponent,
     ToyFormComponent,
     ToyDetailsComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

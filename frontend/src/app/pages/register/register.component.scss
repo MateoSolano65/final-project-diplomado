@@ -1,4 +1,4 @@
-.login-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -6,7 +6,7 @@
   padding: 2rem;
 }
 
-.login-card {
+.register-card {
   width: 100%;
   max-width: 450px;
   padding: 1rem;
@@ -24,7 +24,7 @@
   margin-bottom: 1rem;
 }
 
-.login-loading, .login-error {
+.register-loading, .register-error {
   display: flex;
   align-items: center;
   margin-top: 1rem;
@@ -32,7 +32,7 @@
   border-radius: 4px;
 }
 
-.login-loading {
+.register-loading {
   background-color: rgba(0, 0, 255, 0.05);
 
   mat-spinner {
@@ -40,7 +40,7 @@
   }
 }
 
-.login-error {
+.register-error {
   background-color: rgba(255, 0, 0, 0.05);
   color: #f44336;
 
@@ -49,22 +49,7 @@
   }
 }
 
-.login-info {
-  padding: 1rem;
-  background-color: rgba(0, 0, 255, 0.05);
-
-  mat-icon {
-    vertical-align: middle;
-    margin-right: 0.5rem;
-  }
-
-  ul {
-    margin-top: 0.5rem;
-    padding-left: 1.5rem;
-  }
-}
-
-.create-account {
+.already-account {
   margin-top: 1.5rem;
   text-align: center;
 

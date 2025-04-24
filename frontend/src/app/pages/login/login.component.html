@@ -39,6 +39,7 @@
             (click)="hidePassword = !hidePassword"
             [attr.aria-label]="'Hide password'"
             [attr.aria-pressed]="hidePassword"
+            type="button"
           >
             <mat-icon>{{
               hidePassword ? "visibility_off" : "visibility"
@@ -69,6 +70,12 @@
       <div *ngIf="errorMessage" class="login-error">
         <mat-icon>error</mat-icon>
         <span>Error en las credenciales, intenta de nuevo</span>
+      </div>
+
+      <div class="create-account">
+        <p>
+          ¿No tienes una cuenta? <a routerLink="/register">Regístrate aquí</a>
+        </p>
       </div>
     </mat-card-content>
 
