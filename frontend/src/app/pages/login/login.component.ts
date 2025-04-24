@@ -27,9 +27,9 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     // Redirigir si ya está autenticado
-    if (await this.authService.isLoggedIn()) {
+    if (this.authService.isLoggedIn()) {
       this.router.navigate(['/admin']);
     }
   }
